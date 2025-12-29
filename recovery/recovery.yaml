@@ -69,6 +69,7 @@ actions:
     packages:
       - iproute2
       - procps
+      - iwd
       - firmware-mediatek
       - firmware-misc-nonfree
 
