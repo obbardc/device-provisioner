@@ -1,5 +1,5 @@
 ---
-name: Create binaries for distribution
+name: Create images for distribution
 on:
   push:
     branches-ignore:
@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           path: linux
-          repository: https://github.com/sjoerdsimons/linux.git
+          repository: sjoerdsimons/linux
           ref: sjoerd/mtk-openwrt-one-integration
       - run: |
           apt update
