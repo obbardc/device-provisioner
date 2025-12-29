@@ -19,7 +19,8 @@ jobs:
           repository: sjoerdsimons/linux
           ref: sjoerd/mtk-openwrt-one-integration
       - run: |
-          apt update
+          dpkg --add-architecture arm64;
+          apt update;
           apt install -y devscripts \
               build-essential \
               crossbuild-essential-arm64 \
