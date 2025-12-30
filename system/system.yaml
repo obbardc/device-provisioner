@@ -103,6 +103,7 @@ actions:
 # This needs to run last as apt gets unhappy without machine-id
   - action: run
     description: Setup system for first boot
+    chroot: true
     command: |
       echo 'root:!unprovisioned' | chpasswd -c NONE
       rm -f /etc/hostname
