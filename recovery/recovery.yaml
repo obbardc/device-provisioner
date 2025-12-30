@@ -37,6 +37,7 @@ actions:
       - "path-include=/usr/lib/modules/*/kernel/drivers/net/ethernet/*"
       - "path-include=/usr/lib/modules/*/kernel/drivers/net/ethernet/mediatek/*"
       - "path-include=/usr/lib/modules/*/kernel/drivers/net/wireless/mediatek/*"
+      - "path-exclude=/usr/lib/udev/hwdb.d/*"
 
   - action: overlay
     description: Setup apt repositories
