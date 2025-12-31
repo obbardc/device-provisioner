@@ -7,6 +7,24 @@ on:
   pull_request:
   merge_group:
 jobs:
+  build-installer:
+    runs-on: ubuntu-latest
+    container:
+      image: rust:slim-trixie
+    env:
+      CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+    steps:
+      - uses: actions/checkout@v6
+      - run: rustup target add aarch64-unknown-linux-gnu
+      - run: |
+          apt update
+          apt install -y gcc-aarch64-linux-gnu
+      - run: cd installer ; cargo build --release --target aarch64-unknown-linux-gnu
+      - name: installer binary
+        uses: actions/upload-artifact@v6
+        with:
+          name: installer
+          path: target/aarch64-unknown-linux-gnu/release/installer
   build-bootloaders:
     runs-on: ubuntu-latest
     container:
