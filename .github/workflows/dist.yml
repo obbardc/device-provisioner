@@ -180,3 +180,25 @@ jobs:
         with:
           name: system
           path: "*.img*"
+  publish:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs:
+      - build-nand
+      - build-system-image
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: find
+      - run: |
+          gh release delete latest --yes || true
+          git push origin :latest || true
+      - run: >
+          gh release create latest
+            --prerelease
+            --generate-notes
+            --notes-file .github/workflows/dist-notes.md
+            --target $GITHUB_SHA *.bin *.ubi *.zst *.bmap
