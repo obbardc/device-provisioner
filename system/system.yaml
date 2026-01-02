@@ -3,7 +3,7 @@
 # kernel doesn't work for the one just yet...
 {{ $kernel := or .kernel "local" }}
 {{ $cmdline := or .cmdline "fw_devlink=permissive clk_ignore_unused" }}
-{{ $image := "openwrt.img" }}
+{{ $image := or .image "openwrt.img" }}
 
 architecture: arm64
 
