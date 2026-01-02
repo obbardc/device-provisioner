@@ -2,7 +2,7 @@ Debian on OpenWrt One
 ======================
 
 The `Openwrt One`_ is a nice open hardware access point, running
-OpenWrt by default. As the hardware is reasonably powerfull and expandable,
+OpenWrt by default. As the hardware is reasonably powerful and expandable,
 running a more general purpose OS like Debian on it can be rather convenient.
 
 The onboard storage (NAND) flash is 256MiB, which Debian can be made to fit.
@@ -36,7 +36,7 @@ As a second step a Debian `system` image will be installed to the NVME.
 Flashing NAND:
 --------------
 
-To (re)flash NAND the system will is booted from NOR flash and NAND rewritten
+To (re)flash NAND, the system is booted from NOR flash and NAND rewritten
 from USB; To do this:
 
 * Format a USB stick with a single FAT partition
@@ -49,10 +49,10 @@ Then to flash:
 
 * Switch boot selector on the back from NAND to NOR
 * Power on the device
-* Wait untill the front leds turn on (all three)
+* Wait until the front leds turn on (all three)
 * Hold front key for a couple of seconds, until only the white LED is on
 * Wait for the flashing to finish, green LED will turn on
-* Remove power, switch boot selected back to NAND
+* Remove power, switch boot selector back to NAND
 
 
 Flashing NVME:
@@ -70,8 +70,8 @@ For flashing the recovery image should be booted from NAND:
 
 * Power on the device
 * On first boot `Bad EC magic` messages can be shown, this can be ignored
-* If there was no OS on the NVME, the system will automagically boot the
-  recovery image. Otherwise stop uboot and execute `run boot_recovery`
+* If there was no OS on the NVME, the system will automatically boot the
+  recovery image. Otherwise stop U-Boot and execute `run boot_recovery`
 * On boot a small flasher UI will show up on serial console.
 * Simply select an image to flash (detected on USB drive)
 * Once flashing is done, hit enter to reboot into the Debian system!
