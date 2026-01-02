@@ -174,7 +174,11 @@ jobs:
           mkdir -p system/local-kernel
           rm linux-image*dbg*deb
           cp -v linux-image*_*.deb system/local-kernel
-      - run: debos --fakemachine-backend=kvm --print-recipe system/system.yaml
+      - run: >
+          debos --fakemachine-backend=kvm
+          --print-recipe
+          -t image:openwrt-one-debian-$(date +%Y%m%d%H%M%S).img
+          system/system.yaml
       - name: recovery image
         uses: actions/upload-artifact@v6
         with:
