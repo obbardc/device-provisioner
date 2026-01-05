@@ -6,7 +6,7 @@ fi
 
 pushd arm-trusted-firmware
 
-echo "==== Build ATF for SNAND ===="
+echo "==== Build TF-A for SNAND ===="
 make -j $(nproc) PLAT=mt7981 USE_MKIMAGE=1 \
   BOOT_DEVICE=spim-nand  \
   UBI=1 OVERRIDE_UBI_START_ADDR=0x100000 \
@@ -20,7 +20,7 @@ cp -v build/mt7981/release/bl2.img ../openwrt-mediatek-filogic-openwrt_one-snand
 # Loadable over uart
 cp -v build/mt7981/release/bl2.bin ../openwrt-mediatek-filogic-openwrt_one-snand-preloader.raw
 
-echo "==== Build ATF for UART DL ===="
+echo "==== Build TF-A for UART DL ===="
 make -j $(nproc) PLAT=mt7981  \
   BOOT_DEVICE=ram  \
   RAM_BOOT_UART_DL=1 \

@@ -9,7 +9,7 @@ fi
 CURRENT_DIR="$(pwd)"
 
 if [ ! -f bl31.bin.xz ] ; then
-  echo "Build ATF first!"
+  echo "Build TF-A first!"
   exit 1
 fi
 
