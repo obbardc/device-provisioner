@@ -54,7 +54,7 @@ jobs:
               flex \
               libssl-dev \
               libgnutls28-dev
-      - run: ./scripts/build-atf.sh
+      - run: ./scripts/build-tf-a.sh
       - run: ./scripts/build-u-boot.sh
       - name: Upload bootloader binaries
         uses: actions/upload-artifact@v6
