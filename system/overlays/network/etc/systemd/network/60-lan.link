@@ -1,8 +1,0 @@
-[Match]
-Property=OF_ALIAS_0=ethernet0
-
-[Link]
-AlternativeName=lan
-NamePolicy=keep kernel database onboard slot path
-AlternativeNamesPolicy=database onboard slot path
-MACAddressPolicy=persistent

@@ -1,9 +1,0 @@
-[Match]
-Name=lanbr
-Type=bridge
-
-[Network]
-DHCP=yes
-DNSDefaultRoute=yes
-LLDP=true
-EmitLLDP=true
