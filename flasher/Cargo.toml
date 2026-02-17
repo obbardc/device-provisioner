@@ -21,3 +21,5 @@ tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 tui-logger = { version = "0.18.0", features = ["tracing-subscriber", "tracing-support"] }
 zbus_systemd = { version = "0.25900.0", features = ["systemd1"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

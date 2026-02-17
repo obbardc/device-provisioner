@@ -25,10 +25,12 @@ use ratatui::{
 mod pages;
 use crate::pages::image::ImagePage;
 use crate::pages::{r#final::FinalPage, flash::FlashPage};
+use crate::pages::device::DevicePage;
 
 enum Page {
     // Page to pick the image
     Image(ImagePage),
+    Device { page: DevicePage, image: crate::pages::image::ImageInfo },
     Flash(FlashPage),
     Final(FinalPage),
 }
@@ -39,14 +41,21 @@ impl Page {
             Page::Image(i) => {
                 if let Some(image) = i.selected() {
                     info!("Selected!: {}", image.path.display());
-                    let target = if options.fake {
+                    if options.fake {
                         let _ = tokio::fs::File::create("test.img").await;
-                        PathBuf::from("test.img")
+                        let f = FlashPage::new(image, PathBuf::from("test.img"));
+                        *self = Self::Flash(f);
                     } else {
-                        // Evil hardcoded of NVME device
-                        PathBuf::from("/dev/nvme0n1")
-                    };
-                    let f = FlashPage::new(image, target);
+                        // Show device selection page
+                        let d = DevicePage::new();
+                        *self = Self::Device { page: d, image };
+                    }
+                }
+            }
+            Page::Device { page, image } => {
+                if let Some(device) = page.selected() {
+                    let target = device.path.clone();
+                    let f = FlashPage::new(image.clone(), target);
                     *self = Self::Flash(f);
                 }
             }
@@ -71,6 +80,7 @@ impl AppPage for Page {
     fn input(&mut self, event: Event) {
         match self {
             Page::Image(i) => i.input(event),
+            Page::Device { page, .. } => page.input(event),
             Page::Flash(f) => f.input(event),
             Page::Final(f) => f.input(event),
         }
@@ -79,6 +89,7 @@ impl AppPage for Page {
     async fn needs_update(&mut self) {
         match self {
             Page::Image(i) => i.needs_update().await,
+            Page::Device { page, .. } => page.needs_update().await,
             Page::Flash(f) => f.needs_update().await,
             Page::Final(f) => f.needs_update().await,
         };
@@ -92,6 +103,7 @@ impl Widget for &Page {
     {
         match self {
             Page::Image(i) => i.render(area, buf),
+            Page::Device { page, .. } => page.render(area, buf),
             Page::Flash(f) => f.render(area, buf),
             Page::Final(f) => f.render(area, buf),
         }
