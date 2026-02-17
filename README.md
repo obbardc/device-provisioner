@@ -27,6 +27,15 @@ $ cp ./flasher/target/release/flasher recovery/overlays/flasher/usr/local/bin/fl
 ```
 
 
+Prepare the disk image:
+
+```
+$ cp disk.img out/
+$ zstd -k disk.img
+$ bmaptool create disk.img > disk.img.bmap
+```
+
+
 Then build the image:
 
 ```
