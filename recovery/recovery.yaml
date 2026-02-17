@@ -1,7 +1,8 @@
+{{ $architecture := or .architecture "arm64" }}
 {{ $suite := or .suite "trixie" }}
 {{ $cmdline := or .cmdline "fw_devlink=permissive clk_ignore_unused" }}
 
-architecture: arm64
+architecture: {{ $architecture }}
 
 actions:
   - action: mmdebstrap
