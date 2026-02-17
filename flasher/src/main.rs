@@ -155,7 +155,7 @@ where
                 ])
                 .split(frame.area());
 
-            let line = Line::from("Openwrt one flasher -- ^C to exit")
+            let line = Line::from("Device Provisioner -- ^C to exit")
                 .style(Style::default().bg(Color::Black).fg(Color::Red))
                 .centered();
             frame.render_widget(line, layout[0]);
