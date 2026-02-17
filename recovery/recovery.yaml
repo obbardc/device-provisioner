@@ -187,10 +187,10 @@ actions:
     postprocess: true
     command: cd $ARTIFACTDIR; bmaptool create {{ $image }}.img > {{ $image }}.img.bmap
 
-  # TODO: compress disk image with gzip / bmap to make flashing easier
   - action: run
     description: Compress disk image
     chroot: false
     postprocess: true
     command: |
-      zstd -f ${ARTIFACTDIR}/{{ $image }}.img
+      zstd -f -k ${ARTIFACTDIR}/{{ $image }}.img
+      pigz -f -k ${ARTIFACTDIR}/{{ $image }}.img
