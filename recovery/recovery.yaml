@@ -1,6 +1,6 @@
-{{ $architecture := or .architecture "arm64" }}
+{{ $architecture := or .architecture "amd64" }}
 {{ $suite := or .suite "trixie" }}
-{{ $cmdline := or .cmdline "fw_devlink=permissive clk_ignore_unused" }}
+{{ $cmdline := or .cmdline "" }}
 
 architecture: {{ $architecture }}
 
@@ -19,27 +19,7 @@ actions:
       - "path-exclude=/usr/share/locale/*"
       - "path-include=/usr/share/locale/locale.alias"
       - "path-exclude=/usr/share/doc/*"
-      - "path-exclude=/usr/lib/modules/*/kernel/sound/*"
-      - "path-exclude=/usr/lib/modules/*/kernel/drivers/gpu/*"
-      - "path-exclude=/usr/lib/modules/*/kernel/drivers/media/*"
-      - "path-exclude=/usr/lib/modules/*/kernel/drivers/scsi/*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/scsi/scsi_mod*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/scsi/scsi_common*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/scsi/sd_mod*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/scsi/sg*"
-      - "path-exclude=/usr/lib/modules/*/kernel/drivers/sound/*"
-      - "path-exclude=/usr/lib/modules/*/kernel/drivers/net/*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/net/phy/*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/net/media/*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/net/pcs/*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/net/ethernet/*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/net/ethernet/mediatek/*"
-      - "path-include=/usr/lib/modules/*/kernel/drivers/net/wireless/mediatek/*"
       - "path-exclude=/usr/lib/udev/hwdb.d/*"
-      - "path-exclude=/usr/lib/firmware/"
-      - "path-include=/usr/lib/firmware/airoha"
-      - "path-include=/usr/lib/firmware/mediatek/mt7981*"
-      - "path-include=/usr/lib/firmware/mediatek/mt7915*"
 
   - action: overlay
     description: Setup apt repositories
@@ -78,7 +58,6 @@ actions:
       - procps
       - iwd
       - iw
-      - firmware-mediatek
       - firmware-misc-nonfree
       - nvi
       - curl
@@ -97,7 +76,13 @@ actions:
     description: Install kernel
     recommends: false
     packages:
+{{ if eq $architecture "amd64" }}
+      - linux-image-amd64/trixie-backports
+{{ else if eq $architecture "arm64" }}
       - linux-image-arm64/trixie-backports
+{{ else }}
+  {{ fail "architecture not supported" }}
+{{ end }}
 
   - action: run
     description: init should be /init for initramfs
@@ -114,7 +99,6 @@ actions:
     command: |
       systemctl enable systemd-networkd
       systemctl enable systemd-timesyncd
-      systemctl enable iwd
 
   - action: overlay
     description: Install flasher
@@ -126,22 +110,12 @@ actions:
     command: chmod a+x /usr/local/bin/flasher
 
   - action: run
-    description: Move boot artifacts out of rootfs
-    chroot: false
-    command: |
-      mv -v ${ROOTDIR}/boot/vmlinuz* ${ARTIFACTDIR}/Image
-      cp -v ${ROOTDIR}/lib/linux-image-*/mediatek/mt7981b-openwrt-one.dtb ${ARTIFACTDIR}
-
-  - action: run
     description: Clean up rootfs
     chroot: true
     command: |
       # Drop apt caches
       rm -rf /var/cache/apt/*
       rm -f /var/lib/apt/lists/*_*
-      # Drop dtb's - loaded externally
-      rm -rf /lib/linux-image-*
-      rm -rf /lib/modules/*/dtb
 
   - action: run
     description: Print image size
@@ -160,28 +134,3 @@ actions:
     chroot: false
     command: |
       zstd -f --rm ${ARTIFACTDIR}/recovery.cpio
-
-  - action: run
-    description: Compressing kernel
-    chroot: false
-    command: |
-      gzip -f ${ARTIFACTDIR}/Image
-
-  - action: run
-    description: Set command line for revoery image
-    chroot: false
-    command: |
-      fdtput -t s  ${ARTIFACTDIR}/mt7981b-openwrt-one.dtb \
-      /chosen bootargs "{{ $cmdline }}"
-
-  - action: run
-    description: Building fit image
-    chroot: false
-    command:
-      mkimage -E -f auto
-      -A arm64
-      -O Linux -a 0x44000000 -e 0x44000000
-      -d ${ARTIFACTDIR}/Image.gz
-      -b ${ARTIFACTDIR}/mt7981b-openwrt-one.dtb
-      -i ${ARTIFACTDIR}/recovery.cpio.zst
-      ${ARTIFACTDIR}/recovery.fit
