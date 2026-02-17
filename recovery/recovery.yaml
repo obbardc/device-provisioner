@@ -2,6 +2,8 @@
 {{ $suite := or .suite "trixie" }}
 {{ $cmdline := or .cmdline "" }}
 
+{{ $image := or .image "recovery"  }}
+
 architecture: {{ $architecture }}
 
 actions:
@@ -50,6 +52,11 @@ actions:
       - udev
 
   - action: apt
+    description: Install systemd-boot
+    packages:
+      - systemd-boot-efi
+
+  - action: apt
     description: Install other tools
     recommends: false
     update: false
@@ -80,6 +87,7 @@ actions:
       - linux-image-amd64/trixie-backports
 {{ else if eq $architecture "arm64" }}
       - linux-image-arm64/trixie-backports
+  {{ fail "architecture not supported" }}
 {{ else }}
   {{ fail "architecture not supported" }}
 {{ end }}
@@ -122,15 +130,50 @@ actions:
     chroot: true
     command: "du -scm --exclude='/proc/*' /*"
 
+  - action: image-partition
+    imagename: {{ $image }}.img
+    imagesize: 7.5G
+    partitiontype: gpt
+    mountpoints:
+      - mountpoint: /
+        partition: EFI
+        buildtime: true
+    partitions:
+      - name: EFI
+        partlabel: efi
+        parttype: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+        fs: vfat
+        start: 6176s
+        end: 512M
+        flags: [ boot ]
+      - name: storage
+        fs: ext4
+        start: 512M
+        end: 100%
+
+  # TODO: add image to flash
+  #- action: run
+  #  description: Install images for flashing
+  #  chroot: false
+  #  command: |
+  #    cp ${ARTIFACTDIR}/image.img.gz ${IMAGEMNTDIR}/mnt/image.img.gz
+
+  - action: run
+    description: Setup recovery image
+    chroot: false
+    script: scripts/setup-recovery.sh
+
   - action: run
     description: Create cpio archive
     chroot: false
     command: |
       cd ${ROOTDIR}
-      find . -print | cpio -oH newc >  ${ARTIFACTDIR}/recovery.cpio
+      find . -print | cpio -oH newc > ${ARTIFACTDIR}/recovery.cpio
 
   - action: run
     description: Compressing cpio archive
     chroot: false
     command: |
       zstd -f --rm ${ARTIFACTDIR}/recovery.cpio
+
+  # TODO: compress disk image
