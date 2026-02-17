@@ -10,3 +10,26 @@ The image is generated with [debos](https://github.com/go-debos/debos) and boots
 The installed image can be any operating system. This tool is intentionally OS-agnostic.
 
 Based on [sjoerdsimons/openwrt-one-debian](https://github.com/sjoerdsimons/openwrt-one-debian).
+
+
+## Build instructions
+
+First build the flasher (for `amd64`, other arches will need additional cross-compilation):
+
+```
+$ podman run -it --rm \
+    -v ./flasher:/mnt \
+    -w /mnt \
+    rust:slim-trixie \
+    cargo build --release
+
+$ cp ./flasher/target/release/flasher recovery/overlays/flasher/usr/local/bin/flasher
+```
+
+
+Then build the image:
+
+```
+$ mkdir -p out
+$ debos --artifactdir=out recovery/recovery.yaml
+```
