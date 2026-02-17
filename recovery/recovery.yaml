@@ -138,6 +138,9 @@ actions:
       - mountpoint: /
         partition: EFI
         buildtime: true
+      - mountpoint: /mnt
+        partition: storage
+        buildtime: true
     partitions:
       - name: EFI
         partlabel: efi
@@ -151,29 +154,44 @@ actions:
         start: 512M
         end: 100%
 
-  # TODO: add image to flash
-  #- action: run
-  #  description: Install images for flashing
-  #  chroot: false
-  #  command: |
-  #    cp ${ARTIFACTDIR}/image.img.gz ${IMAGEMNTDIR}/mnt/image.img.gz
+  # TODO: add images to flash
+  - action: run
+    description: Install images for flashing
+    chroot: false
+    command: |
+      cp ${ARTIFACTDIR}/test.img.zst ${IMAGEMNTDIR}/mnt/
+      cp ${ARTIFACTDIR}/test.img.bmap ${IMAGEMNTDIR}/mnt/
 
   - action: run
     description: Setup recovery image
     chroot: false
     script: scripts/setup-recovery.sh
 
-  - action: run
-    description: Create cpio archive
-    chroot: false
-    command: |
-      cd ${ROOTDIR}
-      find . -print | cpio -oH newc > ${ARTIFACTDIR}/recovery.cpio
+  # TODO: handled by scripts/setup-recovery.sh
+  #- action: run
+  #  description: Create cpio archive
+  #  chroot: false
+  #  command: |
+  #    cd ${ROOTDIR}
+  #    find . -print | cpio -oH newc > ${ARTIFACTDIR}/recovery.cpio
+
+  # TODO: handled by scripts/setup-recovery.sh
+  #- action: run
+  #  description: Compressing cpio archive
+  #  chroot: false
+  #  command: |
+  #    zstd -f --rm ${ARTIFACTDIR}/recovery.cpio
 
   - action: run
-    description: Compressing cpio archive
+    description: Create block map for {{ $image }}.img
     chroot: false
-    command: |
-      zstd -f --rm ${ARTIFACTDIR}/recovery.cpio
+    postprocess: true
+    command: cd $ARTIFACTDIR; bmaptool create {{ $image }}.img > {{ $image }}.img.bmap
 
-  # TODO: compress disk image
+  # TODO: compress disk image with gzip / bmap to make flashing easier
+  - action: run
+    description: Compress disk image
+    chroot: false
+    postprocess: true
+    command: |
+      zstd -f ${ARTIFACTDIR}/{{ $image }}.img
