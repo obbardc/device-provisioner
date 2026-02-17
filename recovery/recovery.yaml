@@ -1,7 +1,4 @@
 {{ $suite := or .suite "trixie" }}
-# kernel should be "local" or "debian", default to local for now as the debian
-# kernel doesn't work for the one just yet...
-{{ $kernel := or .kernel "local" }}
 {{ $cmdline := or .cmdline "fw_devlink=permissive clk_ignore_unused" }}
 
 architecture: arm64
@@ -95,27 +92,11 @@ actions:
     description: Disable initramfs creation
     source: overlays/disable-initramfs
 
-{{ if eq $kernel "local" }}
-  - action: overlay
-    description: Put in local debian kernel
-    source: local-kernel
-    destination: /kernel
-
-  - action: run
-    chroot: true
-    command: |
-      apt -y --no-install-recommends install /kernel/*.deb
-      rm -rf /kernel
-
-{{ else if eq $kernel  "debian" }}
   - action: apt
     description: Install kernel
     recommends: false
     packages:
       - linux-image-arm64/trixie-backports
-{{ else }}
-   {{ fail "Kernel not set to a valid value" }}
-{{ end }}
 
   - action: run
     description: init should be /init for initramfs
