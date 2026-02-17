@@ -154,13 +154,12 @@ actions:
         start: 512M
         end: 100%
 
-  # TODO: add images to flash
   - action: run
     description: Install images for flashing
     chroot: false
     command: |
-      cp ${ARTIFACTDIR}/test.img.zst ${IMAGEMNTDIR}/mnt/
-      cp ${ARTIFACTDIR}/test.img.bmap ${IMAGEMNTDIR}/mnt/
+      cp ${ARTIFACTDIR}/disk.img.zst ${IMAGEMNTDIR}/mnt/
+      cp ${ARTIFACTDIR}/disk.img.bmap ${IMAGEMNTDIR}/mnt/
 
   - action: run
     description: Setup recovery image
