@@ -12,10 +12,11 @@ qemu-system-x86_64 \
   -cpu host \
   -smp cpus=2 \
   -m 2048M \
+  -device qemu-xhci,id=xhci \
+  -drive file=${FLASHER_IMG},if=none,format=raw,id=flasher \
+  -device usb-storage,drive=flasher,bus=xhci.0 \
   -device virtio-scsi-pci,id=scsi0 \
-  -drive file=${FLASHER_IMG},if=none,format=raw,id=flasher -device scsi-hd,drive=flasher,bus=scsi0.0 \
-  -device virtio-scsi-pci,id=scsi1 \
-  -drive file=${ROOT_IMG},if=none,format=qcow2,discard=unmap,aio=native,cache=none,id=root -device scsi-hd,drive=root,bus=scsi1.0 \
+  -drive file=${ROOT_IMG},if=none,format=qcow2,discard=unmap,aio=native,cache=none,id=root -device scsi-hd,drive=root,bus=scsi0.0 \
   -boot menu=on \
   -vga qxl \
   -serial stdio \
