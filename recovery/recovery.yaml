@@ -57,6 +57,16 @@ actions:
       - systemd-boot-efi
 
   - action: apt
+    description: Install ssh-server
+    packages:
+      - openssh-server
+
+  - action: run
+    description: Enable root ssh login
+    chroot: true
+    command: sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+  - action: apt
     description: Install other tools
     recommends: false
     update: false
